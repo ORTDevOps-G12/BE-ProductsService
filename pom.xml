@@ -42,7 +42,6 @@
 					</execution>
 				</executions>
 				<configuration>
-					<classifier>spring-boot</classifier>
 					<mainClass>uy.edu.ort.devops.productsserviceexample.ProductsServiceExampleApplication</mainClass>
 				</configuration>
 			</plugin>

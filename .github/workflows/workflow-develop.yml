@@ -52,14 +52,15 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build --build-arg JAR_FILE=products-service-example-0.0.1-SNAPSHOT.jar -t products-service-example:latest .
+          docker build --build-arg JAR_FILE=products-service-example-0.0.1-SNAPSHOT.jar -t ${{ secrets.DOCKER_USERNAME }}/products-service-example:dev1 .
 
-      - name: Save Docker image as artifact
-        run: |
-          docker save products-service-example:latest | gzip > products-service-example-latest.tar.gz
-
-      - name: Upload Docker image as artifact
-        uses: actions/upload-artifact@v2
+      - name: Login en Docker Hub
+        uses: docker/login-action@v2
         with:
-          name: products-service-example-docker-image
-          path: products-service-example-latest.tar.gz
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Push de imagen Docker
+        run: |
+          docker images
+          docker push ${{ secrets.DOCKER_USERNAME }}/products-service-example:dev1

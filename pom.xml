@@ -14,7 +14,7 @@
 	<name>products-service-example</name>
 	<description>Demo project for migrating Monolith to Microservices</description>
 	<properties>
-		<java.version>1.8</java.version>
+		<java.version>17</java.version> <!-- Actualizado a 17 para coincidir con el JDK en GitHub Actions -->
 	</properties>
 	<dependencies>
 		<dependency>
@@ -43,9 +43,7 @@
 				</executions>
 				<configuration>
 					<classifier>spring-boot</classifier>
-					<mainClass>
-						uy.edu.ort.devops.productsserviceexample.ProductsServiceExampleApplication
-					</mainClass>
+					<mainClass>uy.edu.ort.devops.productsserviceexample.ProductsServiceExampleApplication</mainClass>
 				</configuration>
 			</plugin>
 		</plugins>

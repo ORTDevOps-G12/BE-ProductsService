@@ -42,7 +42,7 @@ jobs:
   job-sonar:
     name: Analyze
     runs-on: ubuntu-latest
-    needs: build
+    needs: job-build
     steps:
       - uses: actions/checkout@v3
         with:

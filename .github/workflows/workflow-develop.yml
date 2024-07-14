@@ -111,6 +111,11 @@ jobs:
         working-directory: IaC/IaC
         run: terraform init
 
+      - name: Destroy Terraform 
+        working-directory: IaC/IaC
+        run: |
+            terraform destroy
+            
       - name: Apply Terraform
         working-directory: IaC/IaC
         run: |

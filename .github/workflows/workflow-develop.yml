@@ -37,7 +37,7 @@ jobs:
           ./.github/scripts/build.sh
       
       - name: List contents of output directory for debugging
-        run: ls -la ./codeSource/out
+        run: ls -la ./out
         working-directory: ./codeSource
         
       - name: Verify JAR

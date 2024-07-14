@@ -19,10 +19,10 @@ jobs:
           java-version: '17'
 
       - name: Grant execute permission for Maven Wrapper
-        run: chmod +x ./mvnw
+        run: chmod +x ./codeSource/mvnw
 
       - name: Install dependencies
-        run: ./mvnw dependency:resolve
+        run: ./codeSource/mvnw dependency:resolve
 
       - name: Grant execute permission for build script
         run: chmod +x .github/scripts/build.sh
@@ -31,6 +31,12 @@ jobs:
         run: |
           ./.github/scripts/build.sh
       
+      - name: Verify JAR
+        run: |
+          echo "Verifying JAR in build job..."
+          file target/payments-service-example-0.0.1-SNAPSHOT.jar
+          unzip -p target/payments-service-example-0.0.1-SNAPSHOT.jar META-INF/MANIFEST.MF
+          
       - name: Upload JAR as artifact
         uses: actions/upload-artifact@v2
         with:
@@ -50,6 +56,11 @@ jobs:
           name: products-service-example-jar
           path: ./
 
+      - name: Verify JAR before building Docker image
+        run: |
+          file payments-service-example-0.0.1-SNAPSHOT.jar
+          unzip -p payments-service-example-0.0.1-SNAPSHOT.jar META-INF/MANIFEST.MF
+          
       - name: Build Docker image
         run: |
           docker build --build-arg JAR_FILE=products-service-example-0.0.1-SNAPSHOT.jar -t ${{ secrets.DOCKER_USERNAME }}/products-service-example:dev1 .

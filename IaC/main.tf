@@ -3,7 +3,7 @@ module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "3.18.0"
 
-  name = "my-vpc-tf"
+  name = "my-vpc-tf2"
   cidr = "10.0.0.0/16"
 
   azs             = ["${var.aws_region}a", "${var.aws_region}b"]
@@ -49,7 +49,7 @@ resource "aws_lb" "app" {
 }
 
 resource "aws_lb_target_group" "app" {
-  name        = "my-app-tg-tf"
+  name        = "my-app-tg-tf2"
   port        = 8080
   protocol    = "HTTP"
   vpc_id      = module.vpc.vpc_id

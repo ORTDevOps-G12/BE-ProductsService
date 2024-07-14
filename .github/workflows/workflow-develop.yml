@@ -25,6 +25,21 @@ jobs:
       - name: Grant execute permission for Maven Wrapper
         run: chmod +x ./codeSource/mvnw
 
+      - name: List directory contents for debugging
+        run: ls -la
+
+      - name: List contents of codeSource directory for debugging
+        run: ls -la ./codeSource
+
+      - name: List contents of .mvn/wrapper directory for debugging
+        run: ls -la ./codeSource/.mvn/wrapper
+
+      - name: Grant execute permission for Maven Wrapper
+        run: chmod +x ./codeSource/mvnw
+
+      - name: Verify Maven Wrapper properties file exists
+        run: cat ./codeSource/.mvn/wrapper/maven-wrapper.properties
+        
       - name: Install dependencies
         run: ./codeSource/mvnw dependency:resolve
 

@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - develop
+      - fetura/terrafom
 
 jobs:
   build:

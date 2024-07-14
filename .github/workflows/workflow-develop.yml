@@ -83,7 +83,7 @@ jobs:
           docker images
           docker push ${{ secrets.DOCKER_USERNAME }}/products-service-example:dev1
 
-deploy-tf-backend:
+  deploy-tf-backend:
     runs-on: ubuntu-latest
     needs: docker-build
     env:

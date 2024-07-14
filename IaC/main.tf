@@ -41,7 +41,7 @@ resource "aws_security_group" "ecs" {
 
 # Load Balancer
 resource "aws_lb" "app" {
-  name               = "my-app-lb-tf"
+  name               = "my-app-lb-tf2"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.ecs.id]

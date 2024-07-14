@@ -43,8 +43,8 @@ jobs:
       - name: Verify JAR
         run: |
           echo "Verifying JAR in build job..."
-          file ./out/payments-service-example-0.0.1-SNAPSHOT.jar
-          unzip -p ./out/payments-service-example-0.0.1-SNAPSHOT.jar META-INF/MANIFEST.MF
+          file ./out/products-service-example-0.0.1-SNAPSHOT.jar
+          unzip -p ./out/products-service-example-0.0.1-SNAPSHOT.jar META-INF/MANIFEST.MF
           
       - name: Upload JAR as artifact
         uses: actions/upload-artifact@v2
@@ -67,8 +67,8 @@ jobs:
 
       - name: Verify JAR before building Docker image
         run: |
-          file payments-service-example-0.0.1-SNAPSHOT.jar
-          unzip -p payments-service-example-0.0.1-SNAPSHOT.jar META-INF/MANIFEST.MF
+          file products-service-example-0.0.1-SNAPSHOT.jar
+          unzip -p products-service-example-0.0.1-SNAPSHOT.jar META-INF/MANIFEST.MF
           
       - name: Build Docker image
         run: |

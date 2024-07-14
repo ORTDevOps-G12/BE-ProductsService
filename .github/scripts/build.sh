@@ -9,22 +9,19 @@ export COMMIT_DATE="$(git log --date=format:'%Y-%m-%d %H:%M:%S' --pretty="%cd" -
 printenv
 
 # Remove any existing build directory
-rm -rf ./codeSource/out
+rm -rf ./out
+
+# Change directory
+cd codeSource
 
 # Grant execute permission for Maven Wrapper
-chmod +x ./codeSource/mvnw
+chmod +x ./mvnw
 
 # Compile the project using Maven
-./codeSource/mvnw clean package
+./mvnw clean package
 
 # Create an output directory
-mkdir -p ./codeSource/out
-
-# List contents of target directory for debugging
-ls -la ./codeSource/target
+mkdir -p out
 
 # Copy the JAR file to the output directory
-cp ./codeSource/target/*.jar ./codeSource/out/
-
-# List contents of output directory for debugging
-ls -la ./codeSource/out
+cp codeSource/target/*.jar codeSource/out/

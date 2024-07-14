@@ -11,6 +11,9 @@ printenv
 # Remove any existing build directory
 rm -rf ./out
 
+# Change directory
+cd codeSource
+
 # Grant execute permission for Maven Wrapper
 chmod +x ./mvnw
 

@@ -25,3 +25,6 @@ mkdir -p out
 
 # Copy the JAR file to the output directory
 cp target/*.jar out/
+
+# List contents of output directory for debugging
+ls -la out

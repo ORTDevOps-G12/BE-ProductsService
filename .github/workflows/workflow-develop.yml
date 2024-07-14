@@ -41,16 +41,18 @@ jobs:
         working-directory: ./codeSource
         
       - name: Verify JAR
+        working-directory: ./codeSource
         run: |
           echo "Verifying JAR in build job..."
-          file ./out/products-service-example-0.0.1-SNAPSHOT.jar
-          unzip -p ./out/products-service-example-0.0.1-SNAPSHOT.jar META-INF/MANIFEST.MF
+          file out/products-service-example-0.0.1-SNAPSHOT.jar
+          unzip -p out/products-service-example-0.0.1-SNAPSHOT.jar META-INF/MANIFEST.MF
           
       - name: Upload JAR as artifact
         uses: actions/upload-artifact@v2
+        working-directory: ./codeSource
         with:
           name: products-service-example-jar
-          path: ./out/products-service-example-0.0.1-SNAPSHOT.jar
+          path: out/products-service-example-0.0.1-SNAPSHOT.jar
 
   docker-build:
     runs-on: ubuntu-latest

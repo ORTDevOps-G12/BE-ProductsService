@@ -12,36 +12,22 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
-      - name: Mover al directorio de código
-        run: cd codeSource
         
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           distribution: 'adopt'
           java-version: '17'
-
+      
+      - name: Mover al directorio de código
+        run: cd codeSource
+        
       - name: Grant execute permission for Maven Wrapper
         run: chmod +x ./codeSource/mvnw
-
-      - name: List directory contents for debugging
-        run: ls -la
-
-      - name: List contents of codeSource directory for debugging
-        run: ls -la ./codeSource
-
-      - name: List contents of .mvn/wrapper directory for debugging
-        run: ls -la ./codeSource/.mvn/wrapper
-
-      - name: Grant execute permission for Maven Wrapper
-        run: chmod +x ./codeSource/mvnw
-
-      - name: Verify Maven Wrapper properties file exists
-        run: cat ./codeSource/.mvn/wrapper/maven-wrapper.properties
         
       - name: Install dependencies
-        run: ./codeSource/mvnw dependency:resolve
+        working-directory: ./codeSource
+        run: ./mvnw dependency:resolve
 
       - name: Grant execute permission for build script
         run: chmod +x .github/scripts/build.sh

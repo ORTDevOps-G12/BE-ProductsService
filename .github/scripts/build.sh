@@ -24,4 +24,4 @@ chmod +x ./mvnw
 mkdir -p out
 
 # Copy the JAR file to the output directory
-cp target/*.jar codeSource/out/
+cp target/*.jar out/

@@ -1,10 +1,9 @@
-name: CI/CD Pipeline - Develop
+name: CI/CD Pipeline - Release
 
 on:
   push:
     branches:
-      - develop
-      - feature/terrafom
+      - release
 
 jobs:
   build:
@@ -31,11 +30,6 @@ jobs:
       - name: Run build script
         run: |
           ./.github/scripts/build.sh
-      
-      - name: Get project version
-        run: |
-          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
           
       - name: Verify JAR
         run: |
@@ -69,7 +63,7 @@ jobs:
           
       - name: Build Docker image
         run: |
-          docker build --build-arg JAR_FILE=products-service-example-0.0.1-SNAPSHOT.jar -t ${{ secrets.DOCKER_USERNAME }}/products-service-develop:0.0.1-SNAPSHOT .
+          docker build --build-arg JAR_FILE=products-service-example-0.0.1-SNAPSHOT.jar -t ${{ secrets.DOCKER_USERNAME }}/products-service-release:0.0.1-SNAPSHOT .
 
       - name: Login en Docker Hub
         uses: docker/login-action@v2
@@ -80,7 +74,7 @@ jobs:
       - name: Push de imagen Docker
         run: |
           docker images
-          docker push ${{ secrets.DOCKER_USERNAME }}/products-service-develop:0.0.1-SNAPSHOT
+          docker push ${{ secrets.DOCKER_USERNAME }}/products-service-release:0.0.1-SNAPSHOT
 
   deploy:
     runs-on: ubuntu-latest
@@ -96,10 +90,10 @@ jobs:
 
       - name: Update ECS service
         run: |
-          CLUSTER_NAME="${{ secrets.WORKSPACE-DEV }}-${{ secrets.PROJECT_NAME }}-cluster"
-          SERVICE_NAME="${{ secrets.WORKSPACE-DEV }}-${{ secrets.PROJECT_NAME }}-service"
-          CONTAINER_NAME="${{ secrets.WORKSPACE-DEV }}-${{ secrets.PROJECT_NAME }}-container"
-          IMAGE_NAME="${{ secrets.DOCKER_USERNAME }}/products-service-develop:0.0.1-SNAPSHOT"
+          CLUSTER_NAME="${{ secrets.WORKSPACE-RELEASE }}-${{ secrets.PROJECT_NAME }}-cluster"
+          SERVICE_NAME="${{ secrets.WORKSPACE-RELEASE }}-${{ secrets.PROJECT_NAME }}-service"
+          CONTAINER_NAME="${{ secrets.WORKSPACE-RELEASE }}-${{ secrets.PROJECT_NAME }}-container"
+          IMAGE_NAME="${{ secrets.DOCKER_USERNAME }}/products-service-release:0.0.1-SNAPSHOT"
           
           TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition manualtaskTest)
           NEW_TASK_DEFINITION=$(echo $TASK_DEFINITION | jq --arg IMAGE "$IMAGE_NAME" --arg CONTAINER_NAME "$CONTAINER_NAME" '.taskDefinition | .containerDefinitions |= map(if .name == $CONTAINER_NAME then .image = $IMAGE else . end)')

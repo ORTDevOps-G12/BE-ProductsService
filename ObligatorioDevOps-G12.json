@@ -109,7 +109,7 @@
 	"variable": [
 		{
 			"key": "API_GATEWAY_IP",
-			"value": "172.17.0.4"
+			"value": "35.153.133.116:8080"
 		}
 	]
 }

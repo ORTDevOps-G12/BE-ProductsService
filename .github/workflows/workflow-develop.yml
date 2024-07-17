@@ -18,15 +18,11 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: '17'
-      
-      - name: Mover al directorio de código
-        run: cd codeSource
         
       - name: Grant execute permission for Maven Wrapper
-        run: chmod +x ./codeSource/mvnw
+        run: chmod +x ./mvnw
         
       - name: Install dependencies
-        working-directory: ./codeSource
         run: ./mvnw dependency:resolve
 
       - name: Grant execute permission for build script
@@ -37,7 +33,6 @@ jobs:
           ./.github/scripts/build.sh
           
       - name: Verify JAR
-        working-directory: ./codeSource
         run: |
           echo "Verifying JAR in build job..."
           file out/products-service-example-0.0.1-SNAPSHOT.jar
@@ -47,7 +42,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: products-service-example-jar
-          path: ./codeSource/out/products-service-example-0.0.1-SNAPSHOT.jar
+          path: ./out/products-service-example-0.0.1-SNAPSHOT.jar
 
   docker-build:
     runs-on: ubuntu-latest

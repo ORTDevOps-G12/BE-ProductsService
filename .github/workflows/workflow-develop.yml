@@ -31,18 +31,23 @@ jobs:
       - name: Run build script
         run: |
           ./.github/scripts/build.sh
+      
+      - name: Get project version
+        run: |
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
           
       - name: Verify JAR
         run: |
           echo "Verifying JAR in build job..."
-          file out/products-service-example-0.0.1-SNAPSHOT.jar
-          unzip -p out/products-service-example-0.0.1-SNAPSHOT.jar META-INF/MANIFEST.MF
+          file out/products-service-example-${{ env.VERSION }}.jar
+          unzip -p out/products-service-example-${{ env.VERSION }}.jar META-INF/MANIFEST.MF
           
       - name: Upload JAR as artifact
         uses: actions/upload-artifact@v2
         with:
           name: products-service-example-jar
-          path: ./out/products-service-example-0.0.1-SNAPSHOT.jar
+          path: ./out/products-service-example-${{ env.VERSION }}.jar
 
   docker-build:
     runs-on: ubuntu-latest
@@ -59,12 +64,12 @@ jobs:
 
       - name: Verify JAR before building Docker image
         run: |
-          file products-service-example-0.0.1-SNAPSHOT.jar
-          unzip -p products-service-example-0.0.1-SNAPSHOT.jar META-INF/MANIFEST.MF
+          file products-service-example-${{ env.VERSION }}.jar
+          unzip -p products-service-example-${{ env.VERSION }}.jar META-INF/MANIFEST.MF
           
       - name: Build Docker image
         run: |
-          docker build --build-arg JAR_FILE=products-service-example-0.0.1-SNAPSHOT.jar -t ${{ secrets.DOCKER_USERNAME }}/products-service-example:dev1 -f codeSource/Dockerfile .
+          docker build --build-arg JAR_FILE=products-service-example-${{ env.VERSION }}.jar -t ${{ secrets.DOCKER_USERNAME }}/products-service-example:${{ env.VERSION }} .
 
       - name: Login en Docker Hub
         uses: docker/login-action@v2
@@ -77,41 +82,28 @@ jobs:
           docker images
           docker push ${{ secrets.DOCKER_USERNAME }}/products-service-example:dev1
 
-  deploy-tf-backend:
+  deploy:
     runs-on: ubuntu-latest
     needs: docker-build
-    env:
-      DOCKER_IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/products-service-example:dev1
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
-      AWS_REGION: ${{ secrets.AWS_REGION }}
     steps:
-      - name: Checkout IaC code
-        uses: actions/checkout@v2
-        with:
-          path: IaC
-
-      - name: List files in IaC/IaC directory
-        run: ls -al IaC/IaC
-
       - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Update ECS service
         run: |
-          echo "AWS credentials configured"
-
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v1
-
-      - name: Initialize Terraform
-        working-directory: IaC/IaC
-        run: terraform init
-
-      - name: Destroy Terraform 
-        working-directory: IaC/IaC
-        run: |
-            terraform destroy -auto-approve \
-            -var "aws_access_key=$AWS_ACCESS_KEY_ID" \
-            -var "aws_secret_key=$AWS_SECRET_ACCESS_KEY" \
-            -var "aws_token=$AWS_SESSION_TOKEN" \
-            -var "aws_region=$AWS_REGION" \
-            -var "backend_image=$DOCKER_IMAGE_NAME"
+          CLUSTER_NAME="clusterManualTest"
+          SERVICE_NAME="servicemanualTest"
+          CONTAINER_NAME="containerManualTest"
+          IMAGE_NAME="${{ secrets.DOCKER_USERNAME }}/products-service-example:${{ env.VERSION }}"
+          
+          TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition manualtaskTest)
+          NEW_TASK_DEFINITION=$(echo $TASK_DEFINITION | jq --arg IMAGE "$IMAGE_NAME" --arg CONTAINER_NAME "$CONTAINER_NAME" '.taskDefinition | .containerDefinitions |= map(if .name == $CONTAINER_NAME then .image = $IMAGE else . end)')
+          NEW_TASK_DEFINITION=$(echo $NEW_TASK_DEFINITION | jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)')
+          NEW_TASK_DEFINITION_ARN=$(aws ecs register-task-definition --cli-input-json "$NEW_TASK_DEFINITION" --query 'taskDefinition.taskDefinitionArn' --output text)
+          
+          aws ecs update-service --cluster $CLUSTER_NAME --service $SERVICE_NAME --task-definition $NEW_TASK_DEFINITION_ARN --force-new-deployment

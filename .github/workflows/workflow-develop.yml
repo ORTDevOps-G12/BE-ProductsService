@@ -40,14 +40,14 @@ jobs:
       - name: Verify JAR
         run: |
           echo "Verifying JAR in build job..."
-          file out/products-service-example-${{ env.VERSION }}.jar
-          unzip -p out/products-service-example-${{ env.VERSION }}.jar META-INF/MANIFEST.MF
+          file out/products-service-example-0.0.1-SNAPSHOT.jar
+          unzip -p out/products-service-example-0.0.1-SNAPSHOT.jar META-INF/MANIFEST.MF
           
       - name: Upload JAR as artifact
         uses: actions/upload-artifact@v2
         with:
           name: products-service-example-jar
-          path: ./out/products-service-example-${{ env.VERSION }}.jar
+          path: ./out/products-service-example-0.0.1-SNAPSHOT.jar
 
   docker-build:
     runs-on: ubuntu-latest
@@ -64,12 +64,12 @@ jobs:
 
       - name: Verify JAR before building Docker image
         run: |
-          file products-service-example-${{ env.VERSION }}.jar
-          unzip -p products-service-example-${{ env.VERSION }}.jar META-INF/MANIFEST.MF
+          file products-service-example-0.0.1-SNAPSHOT.jar
+          unzip -p products-service-example-0.0.1-SNAPSHOT.jar META-INF/MANIFEST.MF
           
       - name: Build Docker image
         run: |
-          docker build --build-arg JAR_FILE=products-service-example-${{ env.VERSION }}.jar -t ${{ secrets.DOCKER_USERNAME }}/products-service-example:${{ env.VERSION }} .
+          docker build --build-arg JAR_FILE=products-service-example-0.0.1-SNAPSHOT.jar -t ${{ secrets.DOCKER_USERNAME }}/products-service-example:0.0.1-SNAPSHOT .
 
       - name: Login en Docker Hub
         uses: docker/login-action@v2
@@ -80,7 +80,7 @@ jobs:
       - name: Push de imagen Docker
         run: |
           docker images
-          docker push ${{ secrets.DOCKER_USERNAME }}/products-service-example:dev1
+          docker push ${{ secrets.DOCKER_USERNAME }}/products-service-example:0.0.1-SNAPSHOT
 
   deploy:
     runs-on: ubuntu-latest
@@ -99,7 +99,7 @@ jobs:
           CLUSTER_NAME="clusterManualTest"
           SERVICE_NAME="servicemanualTest"
           CONTAINER_NAME="containerManualTest"
-          IMAGE_NAME="${{ secrets.DOCKER_USERNAME }}/products-service-example:${{ env.VERSION }}"
+          IMAGE_NAME="${{ secrets.DOCKER_USERNAME }}/products-service-example:0.0.1-SNAPSHOT"
           
           TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition manualtaskTest)
           NEW_TASK_DEFINITION=$(echo $TASK_DEFINITION | jq --arg IMAGE "$IMAGE_NAME" --arg CONTAINER_NAME "$CONTAINER_NAME" '.taskDefinition | .containerDefinitions |= map(if .name == $CONTAINER_NAME then .image = $IMAGE else . end)')

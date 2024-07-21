@@ -146,9 +146,9 @@ jobs:
 
       - name: Update ECS service
         run: |
-          CLUSTER_NAME="${{ secrets.WORKSPACE-DEV }}-${{ secrets.PROJECT_NAME }}-cluster"
-          SERVICE_NAME="${{ secrets.WORKSPACE-DEV }}-${{ secrets.PROJECT_NAME }}-service"
-          CONTAINER_NAME="${{ secrets.WORKSPACE-DEV }}-${{ secrets.PROJECT_NAME }}-container"
+          CLUSTER_NAME="${{ secrets.WORKSPACE_DEV }}-${{ secrets.PROJECT_NAME }}-cluster"
+          SERVICE_NAME="${{ secrets.WORKSPACE_DEV }}-${{ secrets.PROJECT_NAME }}-service"
+          CONTAINER_NAME="${{ secrets.WORKSPACE_DEV }}-${{ secrets.PROJECT_NAME }}-container"
           IMAGE_NAME="${{ secrets.DOCKER_USERNAME }}/products-service-develop:0.0.1-SNAPSHOT"
           
           TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition manualtaskTest)
